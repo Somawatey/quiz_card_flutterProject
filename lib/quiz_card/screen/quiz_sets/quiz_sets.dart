@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
 import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_form.dart';
-import 'package:quiz_card_project/quiz_card/widget/custom_card.dart'; // Import your custom card widget (if any)
-//import 'package:quiz_card_project/quiz_card/screen/questions/add_question.dart'; // Import the screen for adding questions
+import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_list.dart';
+// import 'package:quiz_card_project/quiz_card/screen/questions/add_question.dart'; // Import the screen for adding questions
 
 class QuizSets extends StatefulWidget {
   const QuizSets({super.key});
@@ -109,43 +109,32 @@ class _QuizSetsState extends State<QuizSets> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => QuizForm(onCreated: _addQuiz,),
+      builder: (ctx) => QuizForm(
+        onCreated: _addQuiz,
+      ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[50],
       appBar: AppBar(
         title: const Text('Quiz Card'),
         backgroundColor: Colors.purple[500],
       ),
-      body: _registeredQuizzes.isEmpty
-          ? const Center(
-              child: Text(
-                'No quizzes added yet. Start adding some!',
-                style: TextStyle(fontSize: 18),
-              ),
-            )
-          : ListView.builder(
-              itemCount: _registeredQuizzes.length,
-              itemBuilder: (ctx, index) {
-                final quizSet = _registeredQuizzes[index];
-                return GestureDetector(
-                  onTap: () => _showQuizOptions(quizSet), // Show the options on tap
-                  child: ReuseCard(
-                    title: quizSet.title,
-                    description: quizSet.description,
-                    borderColor: _getBorderColor(index),
-                    actionWidget: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => _removeQuiz(quizSet),
-                    ),
-                  )
-                );
-              },
-            ),
+       body: _registeredQuizzes.isEmpty
+    ? const Center(
+        child: Text(
+          'No quizzes added yet. Start adding some!',
+          style: TextStyle(fontSize: 18),
+        ),
+      )
+    : QuizList(
+        quizSets: _registeredQuizzes,
+        onQuizRemoved: _removeQuiz,
+        onShowOptions: _showQuizOptions, // Pass the _showQuizOptions function
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddQuizForm,
         backgroundColor: Colors.purple[500],
@@ -154,14 +143,3 @@ class _QuizSetsState extends State<QuizSets> {
     );
   }
 }
-Color _getBorderColor(int index) {
-    const colors = [
-      Colors.purpleAccent,
-      Colors.blueAccent,
-      Colors.pinkAccent,
-      Colors.deepPurpleAccent,
-      Colors.lightBlueAccent,
-    ];
-    return colors[index % colors.length];
-  }
-

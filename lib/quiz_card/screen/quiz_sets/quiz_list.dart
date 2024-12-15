@@ -6,11 +6,13 @@ import 'package:quiz_card_project/quiz_card/widget/custom_card.dart';
 class QuizList extends StatelessWidget {
   final List<QuizSet> quizSets;
   final Function(QuizSet) onQuizRemoved;
+  final Function(QuizSet) onShowOptions;
 
   const QuizList({
     super.key,
     required this.quizSets,
     required this.onQuizRemoved,
+    required this.onShowOptions,
   });
 
   @override
@@ -40,19 +42,15 @@ class QuizList extends StatelessWidget {
             child: const Icon(Icons.delete, color: Colors.white, size: 30),
           ),
 
-          // Reusable Card with dynamic border and delete button
-          child: ReuseCard(
-            title: quizSet.title,
-            description: quizSet.description,
-            //color base on index that we provide
-            borderColor: _getBorderColor(index),
-            //icon delete on the left side
-            // trailingWidget: ReuseButton(
-            //   icon: Icons.delete,
-            //   color: Colors.redAccent,
-            //   size: 28.0,
-            //   onPressed: () => onQuizRemoved(quizSet),
-            // ),
+          // Reusable Card with tap functionality to show options
+          child: GestureDetector(
+            onTap: () => onShowOptions(quizSet), // Show options modal on tap
+            child: ReuseCard(
+              title: quizSet.title,
+              description: quizSet.description,
+              // Color base on index that we provide
+              borderColor: _getBorderColor(index),
+            ),
           ),
         );
       },
