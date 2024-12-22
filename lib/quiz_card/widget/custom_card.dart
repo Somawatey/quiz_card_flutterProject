@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 class ReuseCard extends StatelessWidget {
   final String title;
-  final String description;
+  final String? description;
   final Color borderColor;
   final Widget? actionWidget; // This is the widget for action like delete, edit, etc.
 
   const ReuseCard({
     super.key,
     required this.title,
-    required this.description,
-    required this.borderColor,
+    this.description,
+    this.borderColor = Colors.purple,
     this.actionWidget, // Default action is null
   });
 
@@ -53,7 +53,7 @@ class ReuseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    description,
+                    description ?? "",
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,

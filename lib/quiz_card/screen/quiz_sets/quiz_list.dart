@@ -47,9 +47,8 @@ class QuizList extends StatelessWidget {
             onTap: () => onShowOptions(quizSet), // Show options modal on tap
             child: ReuseCard(
               title: quizSet.title,
-              description: quizSet.description,
-              // Color base on index that we provide
-              borderColor: _getBorderColor(index),
+                description: quizSet.description ?? "",
+                borderColor: quizSet.color,
             ),
           ),
         );
@@ -57,15 +56,4 @@ class QuizList extends StatelessWidget {
     );
   }
 
-  // Generate dynamic border colors
-  Color _getBorderColor(int index) {
-    const colors = [
-      Colors.purpleAccent,
-      Colors.blueAccent,
-      Colors.pinkAccent,
-      Colors.deepPurpleAccent,
-      Colors.lightBlueAccent,
-    ];
-    return colors[index % colors.length];
-  }
 }

@@ -36,7 +36,7 @@ class QuizItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  quizSet.description, // Use the description property here
+                  quizSet.description ?? "", // Use the description property here
                   style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 14,

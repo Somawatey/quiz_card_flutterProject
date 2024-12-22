@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
+import 'package:quiz_card_project/quiz_card/widget/custom_button.dart';
 
 class QuizForm extends StatefulWidget {
   final void Function(QuizSet) onCreated;
@@ -14,28 +16,54 @@ class _QuizFormState extends State<QuizForm> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   //Category _selectedCategory = Category.learning;
+  String get title => _titleController.text;
+  // DateTime? selectedDate;
+  DateTime selectedDate = DateTime.now(); //set default date to today for user who don't select date
+  Color selectedColor = Colors.blue;//set defualt color to blue for user who don't select color
 
-  void _submitQuiz() {
+
+  @override
+   void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+      super.dispose();
+    }
+
+   void _onAddQuiz() {
     final enteredTitle = _titleController.text.trim();
     final enteredDescription = _descriptionController.text.trim();
 
     if (enteredTitle.isEmpty || enteredDescription.isEmpty) return;
 
-    final newQuiz = QuizSet(
+    QuizSet quizSet = QuizSet(
       title: enteredTitle,
       description: enteredDescription,
-      date: DateTime.now(),
-    //  option: _selectedOption,
+      date: selectedDate,
+      color: selectedColor,
+      //  option: _selectedOption,
     );
 
-    widget.onCreated(newQuiz);
-    Navigator.of(context).pop();
+    widget.onCreated(quizSet);
+    Navigator.pop(context);
   }
+
   void onCancel() {
     // Close modal
     Navigator.pop(context);
   }
 
+  Future<void> setDate() async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,23 +86,71 @@ class _QuizFormState extends State<QuizForm> {
             controller: _descriptionController,
             decoration: const InputDecoration(labelText: 'Description'),
           ),
-          const SizedBox(height: 16),
-          Row(children: [
-          
-            ElevatedButton(
-                  onPressed: onCancel,
-                  child: const Text('Cancel'),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  // ignore: unnecessary_null_comparison
+                  selectedDate == null
+                      ? DateFormat('yyyy-MM-dd').format(DateTime.now()) // Display fallback
+                      : DateFormat('yyyy-MM-dd').format(selectedDate), // Display selected
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                ),
+                const SizedBox(height: 20),
+                IconButton(
+                  onPressed: setDate,
+                  icon: const Icon(Icons.calendar_month),
+                ),
+              ],
             ),
-            Spacer(),
-            ElevatedButton(
-            onPressed: _submitQuiz,
-            child: const Text('Add Quiz',style: TextStyle(color: Colors.white),),
-            style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[500]),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Text("Select Color: "),
+              DropdownButton<Color>(
+                value: selectedColor,
+                onChanged: (Color? newColor) {
+                  setState(() {
+                    selectedColor = newColor!;
+                  });
+                },
+                items: [
+                  Colors.purple,
+                  Colors.blue,
+                  Colors.green,
+                  Colors.orange,
+                  Colors.red,
+                ].map((Color color) {
+                  return DropdownMenuItem<Color>(
+                    value: color,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      color: color,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
-          ],)
-          
-          
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              ReuseButton(
+                onPress: onCancel,
+                label: 'Cancel',
+               
+                color: Colors.purple[100]!,
+                
+              ),
+              Spacer(),
+              ReuseButton(
+                onPress: _onAddQuiz,
+                label: 'Add Quiz',
+            
+              ),
+            ],
+          )
         ],
       ),
     );

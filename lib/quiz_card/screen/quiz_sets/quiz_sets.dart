@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
+import 'package:quiz_card_project/quiz_card/screen/questions/question.dart';
 import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_form.dart';
 import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_list.dart';
-// import 'package:quiz_card_project/quiz_card/screen/questions/add_question.dart'; // Import the screen for adding questions
-
+import 'package:quiz_card_project/quiz_card/data/quizSet_data.dart';
+import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_test.dart'; 
 class QuizSets extends StatefulWidget {
   const QuizSets({super.key});
 
@@ -12,22 +14,9 @@ class QuizSets extends StatefulWidget {
 }
 
 class _QuizSetsState extends State<QuizSets> {
-  final List<QuizSet> _registeredQuizzes = [
-    QuizSet(
-      title: 'Flutter Basics',
-      description: 'Learn the basics of Flutter framework.',
-      date: DateTime.now(),
-    ),
-    QuizSet(
-      title: 'Dart Syntax',
-      description: 'A quick test on Dart syntax.',
-      date: DateTime.now(),
-    ),
-  ];
-
   void _removeQuiz(QuizSet quizSet) {
     setState(() {
-      _registeredQuizzes.remove(quizSet);
+      quizzes_data.remove(quizSet);
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -37,71 +26,64 @@ class _QuizSetsState extends State<QuizSets> {
           label: 'Undo',
           onPressed: () {
             setState(() {
-              _registeredQuizzes.add(quizSet);
+              quizzes_data.add(quizSet);
             });
           },
         ),
       ),
     );
   }
-
-  void _showQuizOptions(QuizSet quizSet) {
-    showModalBottomSheet(
+  
+  void _showQuizOptions(BuildContext context, QuizSet quizSet) {
+    showCupertinoModalPopup(
       context: context,
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text('Add question in ${quizSet.title}'),
-                onTap: () {
-                  // Add your logic to add a question
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              ListTile(
-                title: const Text('Update question set'),
-                onTap: () {
-                  // Add your logic to update the quiz set
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              ListTile(
-                title: const Text('Test'),
-                onTap: () {
-                  // Add your logic for testing
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              ListTile(
-                title: const Text('Flash card'),
-                onTap: () {
-                  // Add your logic for flash cards
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
-                  _removeQuiz(quizSet);
-                  Navigator.of(ctx).pop();
-                },
-              ),
-            ],
+      builder: (ctx) => CupertinoActionSheet(
+        title: Text('Options for ${quizSet.title}'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _showAddQuestionScreen(context, quizSet);
+            },
+            child: const Text('Add Question'),
           ),
-        );
-      },
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // Implement the update quiz logic here
+            },
+            child: const Text('Update Quiz Set'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _startQuizTest(context, quizSet);
+            },
+            child: const Text('Start Quiz Test'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // Implement logic for Flash Card here
+            },
+            child: const Text('Flash Card'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () {
+            Navigator.of(ctx).pop();
+            _removeQuiz(quizSet);
+          },
+          child: const Text('Delete'),
+        ),
+      ),
     );
   }
 
   void _addQuiz(QuizSet newQuizSet) {
     setState(() {
-      _registeredQuizzes.add(newQuizSet);
+      quizzes_data.add(newQuizSet);
     });
   }
 
@@ -114,27 +96,52 @@ class _QuizSetsState extends State<QuizSets> {
       ),
     );
   }
+  // Start Quiz Test
+  void _startQuizTest(BuildContext context, QuizSet quizSet) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QuizTestScreen(quizSet: quizSet),
+      ),
+    );
+  }
 
+  // Question
+  void _showAddQuestionScreen(BuildContext context, QuizSet quizSet) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QuestionScreen(
+          quizSet: quizSet,
+          onQuestionAdded: (quizSet, newQuestion) {
+            setState(() {
+              quizSet.questions.add(newQuestion);
+            });
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Quiz Card'),
         backgroundColor: Colors.purple[500],
       ),
-       body: _registeredQuizzes.isEmpty
-    ? const Center(
-        child: Text(
-          'No quizzes added yet. Start adding some!',
-          style: TextStyle(fontSize: 18),
-        ),
-      )
-    : QuizList(
-        quizSets: _registeredQuizzes,
-        onQuizRemoved: _removeQuiz,
-        onShowOptions: _showQuizOptions, // Pass the _showQuizOptions function
-      ),
+      body: quizzes_data.isEmpty
+          ? const Center(
+              child: Text(
+                'No quizzes added yet. Start adding some!',
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : QuizList(
+              quizSets: quizzes_data,
+              onQuizRemoved: _removeQuiz,
+              onShowOptions: (quizSet) => _showQuizOptions(context, quizSet),
+            ),
+      // Add a floating action button to add a new quiz      
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddQuizForm,
         backgroundColor: Colors.purple[500],
