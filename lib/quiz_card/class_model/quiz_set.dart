@@ -52,3 +52,9 @@ class Answer {
     this.isCorrect = false,
   });
 }
+class Submission {
+  final List<Answer> answers = [];
+  void addAnswer(Answer answer) {
+    answers.add(answer);
+  }
+}

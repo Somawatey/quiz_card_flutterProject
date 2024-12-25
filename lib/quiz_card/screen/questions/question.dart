@@ -6,24 +6,30 @@ class QuestionScreen extends StatefulWidget {
   final Function(Question) onQuestionAdded;
   final Question? question;
   final EditionMode mode;
-  const QuestionScreen({super.key, required this.onQuestionAdded,this.question, this.mode=EditionMode.creating});
+  const QuestionScreen(
+      {super.key,
+      required this.onQuestionAdded,
+      this.question,
+      this.mode = EditionMode.creating});
 
   @override
   State createState() => _QuestionScreenState();
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
-    final _questionController = TextEditingController();
-    final _answerControllers = List.generate(4, (_) => TextEditingController());
-    final _multipleAnswers = [false, false, false, false];
-    int? _correctAnswerIndex;
+  final _questionController = TextEditingController();
+  final _answerControllers = List.generate(4, (_) => TextEditingController());
+  final _multipleAnswers = [false, false, false, false];
+  int? _correctAnswerIndex;
 
-    void _saveQuestion({bool addAnother = false}) {
+  void _saveQuestion({bool addAnother = false}) {
     if (_questionController.text.isEmpty ||
         _answerControllers.any((controller) => controller.text.isEmpty) ||
         _correctAnswerIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields and select a correct answer!')),
+        const SnackBar(
+            content:
+                Text('Please fill all fields and select a correct answer!')),
       );
       return;
     }
@@ -36,14 +42,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
     widget.onQuestionAdded(newQuestion);
 
-    if (addAnother) {
-      // Clear the form for adding another question
-      _clearForm();
-    } else {
-      // Pop the screen after saving the question
-      Navigator.of(context).popUntil((route) => route.isCurrent); // questionlist
-    }
-}
+    // Pop the screen after saving the question
+    Navigator.of(context).popUntil((route) => route.isCurrent); // questionlist
+  }
 
   void _clearForm() {
     setState(() {
@@ -55,10 +56,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
       _correctAnswerIndex = null;
     });
   }
-   @override
+
+  @override
   void initState() {
     super.initState();
-    if (widget.mode == EditionMode.editing && widget.question!= null) {
+    if (widget.mode == EditionMode.editing && widget.question != null) {
       _questionController.text = widget.question!.questionTitle;
       for (var i = 0; i < widget.question!.answers.length; i++) {
         _answerControllers[i].text = widget.question!.answers[i];
@@ -69,6 +71,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       }
     }
   }
+
   @override
   void dispose() {
     _questionController.dispose();
@@ -77,11 +80,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
     super.dispose();
   }
+
   bool get editingMode => widget.mode == EditionMode.editing;
   bool get creatingMode => widget.mode == EditionMode.creating;
 
   String get buttonLabel => creatingMode ? "Add" : "Edit";
-  String get headerLabel => creatingMode ? "Add a new quiz set" : "Edit quiz set";
+  String get headerLabel =>
+      creatingMode ? "Add a new quiz set" : "Edit quiz set";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +103,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
               decoration: const InputDecoration(labelText: 'Question'),
             ),
             const SizedBox(height: 20),
-            const Text('Option Answers', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Option Answers',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             Expanded(
               child: ListView.builder(
                 itemCount: _answerControllers.length,
@@ -108,7 +114,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       Expanded(
                         child: TextFormField(
                           controller: _answerControllers[index],
-                          decoration: InputDecoration(labelText: 'Option ${index + 1}'),
+                          decoration:
+                              InputDecoration(labelText: 'Option ${index + 1}'),
                         ),
                       ),
                       Checkbox(
@@ -116,7 +123,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         onChanged: (value) {
                           setState(() {
                             if (value == true) {
-                              _multipleAnswers.fillRange(0, _multipleAnswers.length, false);
+                              _multipleAnswers.fillRange(
+                                  0, _multipleAnswers.length, false);
                               _multipleAnswers[index] = true;
                               _correctAnswerIndex = index;
                             } else {
@@ -132,46 +140,32 @@ class _QuestionScreenState extends State<QuestionScreen> {
               ),
             ),
             const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 150,
-                child: ReuseButton(
-                  onPress: _clearForm,
-                  icon: Icons.refresh,
-                  label: 'Reset',
-                  color: Colors.red[300]!,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: ReuseButton(
+                    onPress: _clearForm,
+                    icon: Icons.refresh,
+                    label: 'Reset',
+                    color: Colors.red[300]!,
+                  ),
                 ),
-              ),
-
-              SizedBox(
-                width: 150,
-                child: ReuseButton(
-                  onPress: () => _saveQuestion(addAnother: true), // Save and clear form
-                  icon: Icons.add,
-                  label: 'Add More',
-                  color: Colors.blue[400]!,
+                SizedBox(
+                  width: 150, // Fixed width for all buttons
+                  child: ReuseButton(
+                    onPress: () => _saveQuestion(), // Save and pop
+                    icon: Icons.save,
+                    label: buttonLabel,
+                    color: Colors.purple[400]!,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 150, // Fixed width for all buttons
-                child: ReuseButton(
-                  onPress: () => _saveQuestion(addAnother: false), // Save and pop
-                  icon: Icons.save,
-                  label: buttonLabel,
-                  color: Colors.purple[400]!,
-                ),
-              ),
-
-            ],
-          ),
-
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-

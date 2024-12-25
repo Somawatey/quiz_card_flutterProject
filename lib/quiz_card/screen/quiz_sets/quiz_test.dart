@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
-import 'package:quiz_card_project/quiz_card/class_model/submission.dart';
 import 'package:quiz_card_project/quiz_card/screen/answer/result.dart';
 import 'package:quiz_card_project/quiz_card/screen/answer/show_result.dart';
 import 'package:quiz_card_project/quiz_card/widget/custom_button.dart';
