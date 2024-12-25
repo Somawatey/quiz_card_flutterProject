@@ -41,7 +41,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
     _clearForm();
   } else {
     // Pop the screen after saving the question
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
+    Navigator.of(context).popUntil((route) => route.isCurrent); 
   }
 }
 
@@ -167,7 +168,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
             ],
           ),
 
-          
           ],
         ),
       ),
