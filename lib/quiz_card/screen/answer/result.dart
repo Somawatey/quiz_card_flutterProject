@@ -84,11 +84,16 @@ class ResultScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          ReuseButton(
+                          SizedBox(
+                            width: 150,
+                            child: ReuseButton(
                             onPress: onViewResult,
                             label: "View Result",
                             icon: Icons.remove_red_eye,
                           ),
+
+                          )
+                          
                         ],
                       ),
                     ),
@@ -97,15 +102,19 @@ class ResultScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ReuseButton(
+                      SizedBox(width: 150,
+                      child:ReuseButton(
                         onPress: onRestartQuiz,
                         label: "Restart Quiz",
                         icon: Icons.restart_alt,
                       ),
-                      ReuseButton(
+                      ),
+                      SizedBox(width: 150,
+                      child: ReuseButton(
                         onPress: onDone,
                         label: "Done",
                         icon: Icons.done,
+                      ),
                       ),
                     ],
                   ),

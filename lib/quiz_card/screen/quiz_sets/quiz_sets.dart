@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
-import 'package:quiz_card_project/quiz_card/screen/questions/question.dart';
+import 'package:quiz_card_project/quiz_card/screen/questions/question_list.dart';
 import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_form.dart';
 import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_list.dart';
 import 'package:quiz_card_project/quiz_card/data/quizSet_data.dart';
-import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_test.dart'; 
+import 'package:quiz_card_project/quiz_card/screen/quiz_sets/quiz_test.dart';
+
 class QuizSets extends StatefulWidget {
   const QuizSets({super.key});
 
@@ -14,6 +15,7 @@ class QuizSets extends StatefulWidget {
 }
 
 class _QuizSetsState extends State<QuizSets> {
+
   void _removeQuiz(QuizSet quizSet) {
     setState(() {
       quizzes_data.remove(quizSet);
@@ -33,7 +35,7 @@ class _QuizSetsState extends State<QuizSets> {
       ),
     );
   }
-  
+
   void _showQuizOptions(BuildContext context, QuizSet quizSet) {
     showCupertinoModalPopup(
       context: context,
@@ -43,14 +45,7 @@ class _QuizSetsState extends State<QuizSets> {
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _showAddQuestionScreen(context, quizSet);
-            },
-            child: const Text('Add Question'),
-          ),
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              // Implement the update quiz logic here
+              _showEditQuizForm(quizSet);
             },
             child: const Text('Update Quiz Set'),
           ),
@@ -68,6 +63,13 @@ class _QuizSetsState extends State<QuizSets> {
             },
             child: const Text('Flash Card'),
           ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _viewQuestions(context, quizSet);
+            },
+            child: const Text('View Details'),
+          ),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDestructiveAction: true,
@@ -81,21 +83,49 @@ class _QuizSetsState extends State<QuizSets> {
     );
   }
 
-  void _addQuiz(QuizSet newQuizSet) {
-    setState(() {
-      quizzes_data.add(newQuizSet);
-    });
-  }
+ 
 
-  void _showAddQuizForm() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => QuizForm(
-        onCreated: _addQuiz,
+
+  void _showAddQuizForm() async {
+    QuizSet? newQuizSet = await Navigator.of(context).push<QuizSet>(
+      MaterialPageRoute(
+        builder: (ctx) => QuizForm(
+          onCreated: (quizSet) {
+            Navigator.of(ctx).pop(quizSet);
+          },
+          mode: EditionMode.creating,
+        ),
       ),
     );
+
+    if (newQuizSet != null) {
+      setState(() {
+        quizzes_data.add(newQuizSet);
+      });
+    }
   }
+  
+  void _showEditQuizForm(QuizSet quizSet) async {
+    QuizSet? editedQuizSet = await Navigator.of(context).push<QuizSet>(
+      MaterialPageRoute(
+        builder: (ctx) => QuizForm(
+          onCreated: (updatedQuizSet) {
+            Navigator.of(ctx).pop(updatedQuizSet);
+          },
+          quizSet: quizSet,
+          mode: EditionMode.editing,
+        ),
+      ),
+    );
+
+    if (editedQuizSet != null) {
+      int index = quizzes_data.indexOf(quizSet);
+      setState(() {
+        quizzes_data[index] = editedQuizSet;
+      });
+    }
+  }
+
   // Start Quiz Test
   void _startQuizTest(BuildContext context, QuizSet quizSet) {
     Navigator.of(context).push(
@@ -105,18 +135,11 @@ class _QuizSetsState extends State<QuizSets> {
     );
   }
 
-  // Question
-  void _showAddQuestionScreen(BuildContext context, QuizSet quizSet) {
+
+  void _viewQuestions(BuildContext context, QuizSet quizSet) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => QuestionScreen(
-          quizSet: quizSet,
-          onQuestionAdded: (quizSet, newQuestion) {
-            setState(() {
-              quizSet.questions.add(newQuestion);
-            });
-          },
-        ),
+        builder: (context) => QuestionListScreen(quizSet: quizSet),
       ),
     );
   }
@@ -141,7 +164,7 @@ class _QuizSetsState extends State<QuizSets> {
               onQuizRemoved: _removeQuiz,
               onShowOptions: (quizSet) => _showQuizOptions(context, quizSet),
             ),
-      // Add a floating action button to add a new quiz      
+      // Add a floating action button to add a new quiz
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddQuizForm,
         backgroundColor: Colors.purple[500],

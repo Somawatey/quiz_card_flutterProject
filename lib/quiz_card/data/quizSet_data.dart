@@ -4,6 +4,7 @@ import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
 
 final quizzes_data = [
     QuizSet(
+      id: uuid.v4(),
       title: 'Flutter Basics',
       description: 'Learn the basics of Flutter framework.',
       date: DateTime.now(),
@@ -22,6 +23,7 @@ final quizzes_data = [
       ]
     ),
     QuizSet(
+      id: uuid.v4(),
       title: 'Dart Syntax',
       description: 'A quick test on Dart syntax.',
       date: DateTime.now(),
@@ -40,6 +42,7 @@ final quizzes_data = [
       ]
     ),
     QuizSet(
+      id: uuid.v4(),
       title: 'Advanced Flutter',
       description: 'Test your knowledge on advanced Flutter concepts.',
       date: DateTime.now(),
@@ -58,6 +61,7 @@ final quizzes_data = [
     ],
     ),
     QuizSet(
+      id: uuid.v4(),
       title: 'State Management',
       description: 'Test your knowledge on state management in Flutter.',
       date: DateTime.now(),

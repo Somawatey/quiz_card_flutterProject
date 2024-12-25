@@ -36,35 +36,18 @@ class ReuseCard extends StatelessWidget {
               ),
             ),
           ),
-          // Main content of the card
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    description ?? "",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
+            child: ListTile(
+              title: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              subtitle: description != null ? Text(description!) : null,
+              trailing: actionWidget,
             ),
           ),
-          // Action widget like a delete button
-          if (actionWidget != null) actionWidget!,
         ],
       ),
     );

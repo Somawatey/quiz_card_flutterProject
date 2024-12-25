@@ -17,6 +17,7 @@ class QuizList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return ListView.builder(
       itemCount: quizSets.length,
       itemBuilder: (context, index) {
@@ -42,7 +43,7 @@ class QuizList extends StatelessWidget {
             child: const Icon(Icons.delete, color: Colors.white, size: 30),
           ),
 
-          // Reusable Card with tap functionality to show options
+         
           child: GestureDetector(
             onTap: () => onShowOptions(quizSet), // Show options modal on tap
             child: ReuseCard(

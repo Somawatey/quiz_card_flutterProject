@@ -6,7 +6,7 @@ import 'package:quiz_card_project/quiz_card/screen/answer/show_result.dart';
 import 'package:quiz_card_project/quiz_card/widget/custom_button.dart';
 import 'package:quiz_card_project/quiz_card/widget/custom_card.dart';
 
-enum QuizState { notStarted, started, finished }
+
 
 class QuizTestScreen extends StatefulWidget {
   final QuizSet quizSet;
@@ -39,6 +39,9 @@ class _QuizTestScreenState extends State<QuizTestScreen> {
   }
 
   void _submitAnswer(String answer) {
+    if (_currentQuestionIndex >= widget.quizSet.questions.length) {
+    return;
+    }
     final question = widget.quizSet.questions[_currentQuestionIndex];
     final isCorrect = question.correctAnswer == answer;
 
@@ -96,7 +99,13 @@ class _QuizTestScreenState extends State<QuizTestScreen> {
           correctAnswers: correctAnswers.length,
           incorrectAnswers: incorrectAnswers.length,
           onRestartQuiz: () {
-            
+            setState(() {
+              _currentQuestionIndex = 0;
+              _quizState = QuizState.started;
+              _selectedAnswer = null;
+              _submission.answers.clear(); // Clear all previous answers
+            });
+            Navigator.of(context).pop(); // Return to quiz screen
           },
         ),
       ),
@@ -108,7 +117,10 @@ class _QuizTestScreenState extends State<QuizTestScreen> {
     if (_quizState == QuizState.notStarted) {
       return const Center(child: CircularProgressIndicator());
     }
-
+    if (_currentQuestionIndex >= widget.quizSet.questions.length) {
+    _showResults();
+    return const Center(child: CircularProgressIndicator());// Show results immediately after finishing the quiz
+   }
     final question = widget.quizSet.questions[_currentQuestionIndex];
 
     return Scaffold(
@@ -158,8 +170,6 @@ class _QuizTestScreenState extends State<QuizTestScreen> {
                   }).toList(),
 
                   const Spacer(),
-
-                  // ReuseButton for the next question
                   ReuseButton(
                     onPress: _selectedAnswer != null
                         ? () => _submitAnswer(_selectedAnswer!)
