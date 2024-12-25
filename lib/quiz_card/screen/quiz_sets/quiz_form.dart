@@ -12,7 +12,8 @@ class QuizForm extends StatefulWidget {
   final QuizSet? quizSet;
   final EditionMode mode;
 
-  const QuizForm({super.key, required this.onCreated, this.quizSet, required this.mode});
+  const QuizForm(
+      {super.key, required this.onCreated, this.quizSet, required this.mode});
 
   @override
   State createState() => _QuizFormState();
@@ -45,31 +46,35 @@ class _QuizFormState extends State<QuizForm> {
     super.dispose();
   }
 
-  void _saveQuizSet() {
-    bool isValid = _formKey.currentState!.validate();
-
-    if (isValid) {
-      _formKey.currentState!.save();
-
-      String id = editingMode ? widget.quizSet!.id : uuid.v4();
-      Navigator.of(context).pop(
-        QuizSet(
-          id: id,
-          title: _titleController.text.trim(),
-          description: _descriptionController.text.trim(),
-          date: selectedDate,
-          color: selectedColor,
-         
-        ),
+ void _saveQuizSet() {
+  if (_formKey.currentState!.validate()) {
+    if (_questions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add at least one question')),
       );
+      return;
     }
+
+    final newQuizSet = QuizSet(
+      id: const Uuid().v4(),
+      title: _titleController.text,
+      description: _descriptionController.text,
+      date: selectedDate,
+      color: selectedColor,
+      questions: _questions,
+    );
+    
+    widget.onCreated(newQuizSet); // Pass back to parent
+    Navigator.of(context).popUntil((route) => route.isFirst); // Return to previous screen
   }
+}
 
   bool get editingMode => widget.mode == EditionMode.editing;
   bool get creatingMode => widget.mode == EditionMode.creating;
 
   String get buttonLabel => creatingMode ? "Add" : "Edit";
-  String get headerLabel => creatingMode ? "Add a new quiz set" : "Edit quiz set";
+  String get headerLabel =>
+      creatingMode ? "Add a new quiz set" : "Edit quiz set";
 
   void _resetForm() {
     _formKey.currentState!.reset();
@@ -95,24 +100,31 @@ class _QuizFormState extends State<QuizForm> {
       });
     }
   }
-  
-  void _navigateToAddQuestion() async {
+
+  void _addQuestion() async {
+  if (_titleController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please add quiz title first')),
+    );
+    return;
+  }
+
   final question = await Navigator.of(context).push<Question>(
     MaterialPageRoute(
       builder: (ctx) => QuestionScreen(
-        onQuestionAdded: (newQuestion) {
-          Navigator.of(ctx).pop(newQuestion);
-        },
+        onQuestionAdded: (question) => Navigator.pop(ctx, question),
+        mode: EditionMode.creating,
       ),
     ),
   );
 
-  if (question != null) {
+  if (question != null && mounted) {
     setState(() {
-      _questions.add(question);
+      _questions.add(question); // Add to local list
     });
   }
 }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,21 +160,23 @@ class _QuizFormState extends State<QuizForm> {
                 decoration: const InputDecoration(labelText: 'Description'),
               ),
               Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  // ignore: unnecessary_null_comparison
-                  selectedDate == null
-                      ? DateFormat('yyyy-MM-dd').format(DateTime.now()) // Display fallback
-                      : DateFormat('yyyy-MM-dd').format(selectedDate), // Display selected
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                ),
-                const SizedBox(height: 20),
-                IconButton(
-                  onPressed: setDate,
-                  icon: const Icon(Icons.calendar_month),
-                ),
-              ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedDate == null
+                        ? DateFormat('yyyy-MM-dd')
+                            .format(DateTime.now()) // Display fallback
+                        : DateFormat('yyyy-MM-dd')
+                            .format(selectedDate), // Display selected
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
+                  const SizedBox(height: 20),
+                  IconButton(
+                    onPressed: setDate,
+                    icon: const Icon(Icons.calendar_month),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               DropdownButton<Color>(
@@ -185,13 +199,12 @@ class _QuizFormState extends State<QuizForm> {
                 }).toList(),
               ),
               const SizedBox(height: 20),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   SizedBox(
                     width: 150,
-                    child:ReuseButton(
+                    child: ReuseButton(
                       onPress: _resetForm,
                       label: 'Reset',
                       color: Colors.red[300]!,
@@ -200,19 +213,19 @@ class _QuizFormState extends State<QuizForm> {
                   ),
                   SizedBox(
                     width: 150,
-                    child:ReuseButton(
-                    onPress: _navigateToAddQuestion,
-                    label: 'Question',
-                    icon: Icons.add,
-                    color: Colors.blue[300]!,
+                    child: ReuseButton(
+                      onPress: _addQuestion,
+                      label: 'Question',
+                      icon: Icons.add,
+                      color: Colors.blue[300]!,
                     ),
                   ),
                   SizedBox(
                     width: 150,
                     child: ReuseButton(
-                    onPress: _saveQuizSet,
-                    label: buttonLabel,
-                    icon: Icons.save, 
+                      onPress: _saveQuizSet,
+                      label: buttonLabel,
+                      icon: Icons.save,
                     ),
                   ),
                 ],
@@ -224,4 +237,3 @@ class _QuizFormState extends State<QuizForm> {
     );
   }
 }
-

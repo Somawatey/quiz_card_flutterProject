@@ -4,46 +4,45 @@ import 'package:quiz_card_project/quiz_card/widget/custom_button.dart';
 
 class QuestionScreen extends StatefulWidget {
   final Function(Question) onQuestionAdded;
-  final Question? questionToEdit;
+  final Question? question;
   final EditionMode mode;
-  const QuestionScreen({super.key, required this.onQuestionAdded,this.questionToEdit, this.mode=EditionMode.creating});
+  const QuestionScreen({super.key, required this.onQuestionAdded,this.question, this.mode=EditionMode.creating});
 
   @override
   State createState() => _QuestionScreenState();
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
-  final _questionController = TextEditingController();
-  final _answerControllers = List.generate(4, (_) => TextEditingController());
-  final _multipleAnswers = [false, false, false, false];
-  int? _correctAnswerIndex;
+    final _questionController = TextEditingController();
+    final _answerControllers = List.generate(4, (_) => TextEditingController());
+    final _multipleAnswers = [false, false, false, false];
+    int? _correctAnswerIndex;
 
-  void _saveQuestion({bool addAnother = false}) {
-  if (_questionController.text.isEmpty ||
-      _answerControllers.any((controller) => controller.text.isEmpty) ||
-      _correctAnswerIndex == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please fill all fields and select a correct answer!')),
+    void _saveQuestion({bool addAnother = false}) {
+    if (_questionController.text.isEmpty ||
+        _answerControllers.any((controller) => controller.text.isEmpty) ||
+        _correctAnswerIndex == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields and select a correct answer!')),
+      );
+      return;
+    }
+
+    final newQuestion = Question(
+      questionTitle: _questionController.text,
+      answers: _answerControllers.map((controller) => controller.text).toList(),
+      correctAnswer: _answerControllers[_correctAnswerIndex!].text,
     );
-    return;
-  }
 
-  final newQuestion = Question(
-    questionTitle: _questionController.text,
-    answers: _answerControllers.map((controller) => controller.text).toList(),
-    correctAnswer: _answerControllers[_correctAnswerIndex!].text,
-  );
+    widget.onQuestionAdded(newQuestion);
 
-  widget.onQuestionAdded(newQuestion);
-
-  if (addAnother) {
-    // Clear the form for adding another question
-    _clearForm();
-  } else {
-    // Pop the screen after saving the question
-    //Navigator.of(context).pop();
-    Navigator.of(context).popUntil((route) => route.isCurrent); 
-  }
+    if (addAnother) {
+      // Clear the form for adding another question
+      _clearForm();
+    } else {
+      // Pop the screen after saving the question
+      Navigator.of(context).popUntil((route) => route.isCurrent); // questionlist
+    }
 }
 
   void _clearForm() {
@@ -59,11 +58,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
    @override
   void initState() {
     super.initState();
-    if (widget.mode == EditionMode.editing && widget.questionToEdit != null) {
-      _questionController.text = widget.questionToEdit!.questionTitle;
-      for (var i = 0; i < widget.questionToEdit!.answers.length; i++) {
-        _answerControllers[i].text = widget.questionToEdit!.answers[i];
-        if (widget.questionToEdit!.answers[i] == widget.questionToEdit!.correctAnswer) {
+    if (widget.mode == EditionMode.editing && widget.question!= null) {
+      _questionController.text = widget.question!.questionTitle;
+      for (var i = 0; i < widget.question!.answers.length; i++) {
+        _answerControllers[i].text = widget.question!.answers[i];
+        if (widget.question!.answers[i] == widget.question!.correctAnswer) {
           _correctAnswerIndex = i;
           _multipleAnswers[i] = true;
         }

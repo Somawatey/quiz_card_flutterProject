@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_card_project/quiz_card/class_model/quiz_set.dart';
-//import 'package:quiz_card_project/quiz_card/widget/custom_button.dart';
 import 'package:quiz_card_project/quiz_card/widget/custom_card.dart';
 
 class QuizList extends StatelessWidget {
@@ -23,7 +22,6 @@ class QuizList extends StatelessWidget {
       itemBuilder: (context, index) {
         final quizSet = quizSets[index];
 
-        // Wrap the card in Dismissible for swipe-to-delete functionality
         return Dismissible(
           key: Key(quizSet.title), // Unique key based on quiz title
           direction: DismissDirection.endToStart,
@@ -50,6 +48,7 @@ class QuizList extends StatelessWidget {
               title: quizSet.title,
                 description: quizSet.description ?? "",
                 borderColor: quizSet.color,
+                date: quizSet.date,
             ),
           ),
         );

@@ -41,7 +41,7 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
         builder: (context) => QuestionScreen(
           onQuestionAdded: (updatedQuestion) => Navigator.pop(context, updatedQuestion),
           mode: EditionMode.editing,
-          questionToEdit: question,
+          question: question,
         ),
       ),
     );

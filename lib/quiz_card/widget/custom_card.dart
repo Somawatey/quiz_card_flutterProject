@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReuseCard extends StatelessWidget {
   final String title;
   final String? description;
   final Color borderColor;
-  final Widget? actionWidget; // This is the widget for action like delete, edit, etc.
+  final Widget? actionWidget;
+  final DateTime? date;
 
   const ReuseCard({
     super.key,
     required this.title,
     this.description,
     this.borderColor = Colors.purple,
-    this.actionWidget, // Default action is null
+    this.actionWidget,
+    this.date,
   });
 
   @override
@@ -24,7 +27,6 @@ class ReuseCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Colored border on the side
           Container(
             width: 8,
             height: 80,
@@ -42,10 +44,25 @@ class ReuseCard extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
               subtitle: description != null ? Text(description!) : null,
-              trailing: actionWidget,
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (date != null)
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(date!),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  if (actionWidget != null) actionWidget!,
+                ],
+              ),
             ),
           ),
         ],

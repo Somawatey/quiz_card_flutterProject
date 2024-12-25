@@ -17,24 +17,24 @@ class QuizSets extends StatefulWidget {
 class _QuizSetsState extends State<QuizSets> {
 
   void _removeQuiz(QuizSet quizSet) {
-    setState(() {
-      quizzes_data.remove(quizSet);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Quiz removed.'),
-        duration: const Duration(seconds: 3),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              quizzes_data.add(quizSet);
-            });
-          },
+      setState(() {
+        quizzes_data.remove(quizSet);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Quiz removed.'),
+          duration: const Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                quizzes_data.add(quizSet);
+              });
+            },
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   void _showQuizOptions(BuildContext context, QuizSet quizSet) {
     showCupertinoModalPopup(
@@ -47,32 +47,25 @@ class _QuizSetsState extends State<QuizSets> {
               Navigator.of(ctx).pop();
               _showEditQuizForm(quizSet);
             },
-            child: const Text('Update Quiz Set'),
+            child: const Text('Update Quiz'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(ctx).pop();
               _startQuizTest(context, quizSet);
             },
-            child: const Text('Start Quiz Test'),
-          ),
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              // Implement logic for Flash Card here
-            },
-            child: const Text('Flash Card'),
+            child: const Text('Start Quiz'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(ctx).pop();
               _viewQuestions(context, quizSet);
             },
-            child: const Text('View Details'),
+            child: const Text('View Question'),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
-          isDestructiveAction: true,
+          isDestructiveAction: true, //use this to make the cancel button red
           onPressed: () {
             Navigator.of(ctx).pop();
             _removeQuiz(quizSet);
@@ -126,7 +119,6 @@ class _QuizSetsState extends State<QuizSets> {
     }
   }
 
-  // Start Quiz Test
   void _startQuizTest(BuildContext context, QuizSet quizSet) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -134,7 +126,6 @@ class _QuizSetsState extends State<QuizSets> {
       ),
     );
   }
-
 
   void _viewQuestions(BuildContext context, QuizSet quizSet) {
     Navigator.of(context).push(
@@ -149,7 +140,7 @@ class _QuizSetsState extends State<QuizSets> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Quiz Card'),
+        title: const Text('Quiz Card', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.purple[500],
       ),
       body: quizzes_data.isEmpty

@@ -10,21 +10,19 @@ enum QuizState { notStarted, started, finished }
 class QuizSet {
   final String id;
   final String title;
-  final String? description; // Make description optional
+  final String? description; 
   final DateTime date;
   final Color color;
-  List<Question> questions; // List of questions
-  //final QuizMode mode;
-  // Optional option for quiz actions
+  List<Question> questions;
+  
 
   QuizSet({
     required this.id,
     required this.title,
     required this.date,
-    this.description, // Now optional
+    this.description,
     required this.color,
-    this.questions = const [], // Initialize with an empty list
-    //this.mode = QuizMode.practice,  // Optional action
+    this.questions = const [],
   }) ; //: id = uuid.v4()
 
   @override
@@ -41,7 +39,7 @@ class Question {
   Question({
     required this.questionTitle,
     required this.answers,
-    required this.correctAnswer, // List of correct answers
+    required this.correctAnswer, 
   });
 }
 
