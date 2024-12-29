@@ -23,6 +23,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   int? _correctAnswerIndex;
 
   void _saveQuestion({bool addAnother = false}) {
+    //validation check
     if (_questionController.text.isEmpty ||
         _answerControllers.any((controller) => controller.text.isEmpty) ||
         _correctAnswerIndex == null) {
@@ -42,8 +43,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
     widget.onQuestionAdded(newQuestion);
 
-    // Pop the screen after saving the question
-    Navigator.of(context).popUntil((route) => route.isCurrent); // questionlist
+    if (addAnother) {
+      _clearForm();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Question added successfully! Add another one.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      //Navigator.of(context).pop();
+      Navigator.of(context).popUntil((route) => route.isCurrent); // Return to question list
+    }
   }
 
   void _clearForm() {
@@ -153,9 +164,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                 ),
                 SizedBox(
-                  width: 150, // Fixed width for all buttons
+                  width: 150, 
                   child: ReuseButton(
-                    onPress: () => _saveQuestion(), // Save and pop
+                    onPress: () => _saveQuestion(addAnother: false),
                     icon: Icons.save,
                     label: buttonLabel,
                     color: Colors.purple[400]!,
@@ -163,6 +174,20 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ),
               ],
             ),
+            SizedBox(height: 20,),
+            Row(
+              children: [
+                Expanded(            
+                  child: ReuseButton(
+                    onPress: () => _saveQuestion(addAnother: true),  // need to update more on this because it is not working as expected the flow if we add another question true(clear form and stay) and false (go back to question list)
+                    icon: Icons.add,
+                    label: 'Add another question',
+                    color: Colors.blue[400]!,
+                
+                ),
+                )
+              ],
+            )
           ],
         ),
       ),
