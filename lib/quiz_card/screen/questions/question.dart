@@ -53,7 +53,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
       );
     } else {
       //Navigator.of(context).pop();
-      Navigator.of(context).popUntil((route) => route.isCurrent); // Return to question list
+      Navigator.of(context).popUntil((route) => route.isCurrent); 
+      
     }
   }
 
@@ -63,7 +64,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       for (var controller in _answerControllers) {
         controller.clear();
       }
-      _multipleAnswers.fillRange(0, _multipleAnswers.length, false);
+      _multipleAnswers.fillRange(0, _multipleAnswers.length, false); //use fillRange to fill the list with false 
       _correctAnswerIndex = null;
     });
   }
